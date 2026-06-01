@@ -1,0 +1,16 @@
+{
+  "name": "@castle/cli",
+  "version": "0.1.2",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "castle": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "bun build src/index.ts --target=bun --outfile=dist/castle"
+  },
+  "dependencies": {
+    "atlas": "github:wess/atlas#main",
+    "@castle/core": "workspace:*"
+  }
+}

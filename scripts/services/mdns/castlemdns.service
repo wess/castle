@@ -1,0 +1,13 @@
+[Unit]
+Description=Castle mDNS hostname aliases
+After=avahi-daemon.service network-online.target
+Wants=avahi-daemon.service network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/castle-mdns
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

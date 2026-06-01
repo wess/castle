@@ -1,0 +1,5 @@
+# Allow the castle daemon (running as wess) to reload its mDNS publisher
+# after editing /etc/castle/mdns-aliases. Scope is intentionally narrow:
+# only systemctl, only restart, only this one unit.
+wess ALL=(root) NOPASSWD: /usr/bin/systemctl restart castle-mdns.service
+wess ALL=(root) NOPASSWD: /bin/systemctl restart castle-mdns.service

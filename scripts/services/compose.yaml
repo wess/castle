@@ -1,0 +1,125 @@
+# Shared homelab service stack: one Postgres backing Castle, Tangle, and Stohr.
+# Castle runs natively (systemd) and reaches Postgres via 127.0.0.1:5432.
+# Tangle + Stohr run here. nginx fronts everything by hostname.
+
+name: vegeta
+
+networks:
+  default:
+    name: vegeta-net
+
+volumes:
+  pgdata:
+  tangle-repos:
+  tangle-blobs:
+  stohr-blobs:
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_ROOT_PASSWORD}
+      POSTGRES_DB: postgres
+      CASTLE_DB_PASSWORD: ${CASTLE_DB_PASSWORD}
+      TANGLE_DB_PASSWORD: ${TANGLE_DB_PASSWORD}
+      STOHR_DB_PASSWORD: ${STOHR_DB_PASSWORD}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  tangle-api:
+    build:
+      context: ./tangle
+      dockerfile: Dockerfile
+    command: bun src/server.ts
+    restart: unless-stopped
+    environment:
+      PORT: "3000"
+      NODE_ENV: production
+      DATABASE_URL: postgres://tangle:${TANGLE_DB_PASSWORD}@postgres:5432/tangle
+      SECRET: ${TANGLE_SECRET}
+      REPO_DIR: /data/repos
+      STORAGE_DRIVER: local
+      STORAGE_LOCAL_DIR: /data/blobs
+      APP_URL: http://tangle.local
+      RESEND_API_KEY: ""
+      RESEND_FROM: "Tangle <onboarding@resend.dev>"
+      RP_ID: tangle.local
+      RP_NAME: Tangle
+      RP_ORIGIN: http://tangle.local
+      TRUSTED_PROXIES: 172.16.0.0/12
+      MAX_UPLOAD_BYTES: "1073741824"
+    volumes:
+      - tangle-repos:/data/repos
+      - tangle-blobs:/data/blobs
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3000:3000"
+
+  tangle-web:
+    build:
+      context: ./tangle
+      dockerfile: Dockerfile
+    command: bun src/web/serve.ts
+    restart: unless-stopped
+    environment:
+      WEB_PORT: "3001"
+      API_URL: http://tangle-api:3000
+    depends_on:
+      - tangle-api
+    ports:
+      - "127.0.0.1:3001:3001"
+
+  stohr-api:
+    build:
+      context: ./stohr
+      dockerfile: Dockerfile
+    command: bun src/server.ts
+    restart: unless-stopped
+    environment:
+      PORT: "3000"
+      NODE_ENV: production
+      DATABASE_URL: postgres://stohr:${STOHR_DB_PASSWORD}@postgres:5432/stohr
+      SECRET: ${STOHR_SECRET}
+      STORAGE_DRIVER: local
+      STORAGE_LOCAL_DIR: /data/blobs
+      APP_URL: http://storage.local
+      RESEND_API_KEY: ""
+      RESEND_FROM: "Stohr <onboarding@resend.dev>"
+      RP_ID: storage.local
+      RP_NAME: Stohr
+      RP_ORIGIN: http://storage.local
+      TRUSTED_PROXIES: 172.16.0.0/12
+      MAX_UPLOAD_BYTES: "1073741824"
+    volumes:
+      - stohr-blobs:/data/blobs
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3010:3000"
+
+  stohr-web:
+    build:
+      context: ./stohr
+      dockerfile: Dockerfile
+    command: bun src/web/serve.ts
+    restart: unless-stopped
+    environment:
+      WEB_PORT: "3001"
+      API_URL: http://stohr-api:3000
+    depends_on:
+      - stohr-api
+    ports:
+      - "127.0.0.1:3011:3001"

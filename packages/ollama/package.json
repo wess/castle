@@ -1,0 +1,10 @@
+{
+  "name": "@castle/ollama",
+  "version": "0.1.2",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

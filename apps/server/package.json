@@ -1,0 +1,22 @@
+{
+  "name": "@castle/server",
+  "version": "0.1.2",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "dev": "bun --watch run src/index.ts",
+    "start": "bun run src/index.ts",
+    "build": "bun build src/index.ts --target=bun --outdir=dist"
+  },
+  "dependencies": {
+    "atlas": "github:wess/atlas#main",
+    "@castle/apps": "workspace:*",
+    "@castle/core": "workspace:*",
+    "@castle/docker": "workspace:*",
+    "@castle/lxc": "workspace:*",
+    "@castle/network": "workspace:*",
+    "@castle/ollama": "workspace:*",
+    "@castle/storage": "workspace:*"
+  }
+}
