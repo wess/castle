@@ -173,6 +173,57 @@ wess ALL=(root) NOPASSWD: /usr/local/bin/castle-nginx-site
 EOF
 chmod 0440 /etc/sudoers.d/castle-nginx
 
+# ---------------------------------------------------------------------------
+# LXC unprivileged provisioning.
+# castled runs as `wess`, so lxc-create/lxc-start build *unprivileged*
+# containers. That needs the toolchain, a subuid/subgid range, an idmap in the
+# user's default container config, veth quota on the bridge, and traverse
+# access to the rootfs path. Without these, POST /api/lxc fails with a 500.
+# ---------------------------------------------------------------------------
+LXC_USER=wess
+LXC_HOME=/home/$LXC_USER
+
+if ! command -v lxc-create >/dev/null 2>&1; then
+  log "installing lxc"
+  DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends lxc lxc-templates
+fi
+
+# A subuid/subgid range maps container root onto unprivileged host uids.
+if ! grep -q "^${LXC_USER}:" /etc/subuid; then
+  echo "${LXC_USER}:100000:65536" >> /etc/subuid
+fi
+if ! grep -q "^${LXC_USER}:" /etc/subgid; then
+  echo "${LXC_USER}:100000:65536" >> /etc/subgid
+fi
+SUBUID_BASE=$(grep "^${LXC_USER}:" /etc/subuid | head -1 | cut -d: -f2)
+SUBGID_BASE=$(grep "^${LXC_USER}:" /etc/subgid | head -1 | cut -d: -f2)
+
+# Per-user default container config: map container root onto the subuid range
+# and skip apparmor (the host has no apparmor_parser, and the included
+# /etc/lxc/default.conf otherwise forces a `generated` profile that can't load;
+# unprivileged containers are already isolated by the uid mapping).
+install -d -o "$LXC_USER" -g "$LXC_USER" -m 0755 "$LXC_HOME/.config/lxc"
+cat > "$LXC_HOME/.config/lxc/default.conf" <<EOF
+lxc.include = /etc/lxc/default.conf
+lxc.idmap = u 0 $SUBUID_BASE 65536
+lxc.idmap = g 0 $SUBGID_BASE 65536
+lxc.apparmor.profile = unconfined
+EOF
+chown "$LXC_USER:$LXC_USER" "$LXC_HOME/.config/lxc/default.conf"
+
+# Let the user attach veth NICs to the default bridge (lxc-user-nic quota).
+if [ ! -f /etc/lxc/lxc-usernet ] || ! grep -q "^${LXC_USER} veth" /etc/lxc/lxc-usernet; then
+  echo "${LXC_USER} veth lxcbr0 10" >> /etc/lxc/lxc-usernet
+fi
+
+# The mapped container root must be able to traverse the home dir to reach
+# ~/.local/share/lxc/<name>/rootfs (home is mode 0700 by default).
+setfacl -m u:"$SUBUID_BASE":x "$LXC_HOME"
+
+# The default bridge supplies container networking + DHCP.
+systemctl enable lxc-net >/dev/null 2>&1 || true
+systemctl start lxc-net >/dev/null 2>&1 || true
+
 log "validating nginx config"
 nginx -t
 
