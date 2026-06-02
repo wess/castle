@@ -19,11 +19,12 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Eye, Globe, Pencil, Plus, RefreshCw, Trash, X } from "lucide-react";
 import { useState } from "react";
 import { errorMessage } from "../api/client.ts";
 import * as api from "../api/index.ts";
+import { useLiveQuery } from "../live/index.ts";
 
 const ensureLocal = (n: string): string => {
   const t = n.trim().toLowerCase();
@@ -39,12 +40,12 @@ type EditState = {
 
 export const Domains = () => {
   const qc = useQueryClient();
-  const { data: aliasData } = useQuery({ queryKey: ["domains"], queryFn: api.domains.list, refetchInterval: 15_000 });
-  const { data: routes } = useQuery({ queryKey: ["routes"], queryFn: api.routes.list, refetchInterval: 15_000 });
-  const { data: sites } = useQuery({
+  const { data: aliasData } = useLiveQuery({ queryKey: ["domains"], queryFn: api.domains.list, topic: "domains" });
+  const { data: routes } = useLiveQuery({ queryKey: ["routes"], queryFn: api.routes.list, topic: "routes" });
+  const { data: sites } = useLiveQuery({
     queryKey: ["nginx-sites"],
     queryFn: api.routes.listSites,
-    refetchInterval: 30_000,
+    topic: "nginx-sites",
   });
 
   const byHost = new Map((routes ?? []).map((r) => [r.hostname, r]));

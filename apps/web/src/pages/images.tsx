@@ -1,16 +1,17 @@
 import { ActionIcon, Button, Card, Group, Modal, Stack, Table, Text, TextInput, Title, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Download, Trash } from "lucide-react";
 import { useState } from "react";
 import { errorMessage } from "../api/client.ts";
 import * as api from "../api/index.ts";
 import { bytes } from "../format.ts";
+import { useLiveQuery } from "../live/index.ts";
 
 export const Images = () => {
   const qc = useQueryClient();
-  const { data, isLoading } = useQuery({ queryKey: ["images"], queryFn: api.images.list, refetchInterval: 10_000 });
+  const { data, isLoading } = useLiveQuery({ queryKey: ["images"], queryFn: api.images.list, topic: "images" });
   const [opened, { open, close }] = useDisclosure(false);
   const [ref, setRef] = useState("");
 

@@ -1,6 +1,6 @@
 import { ActionIcon, Anchor, Button, Card, Group, Stack, Table, Text, Title, Tooltip } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Play, Plus, Square, Terminal as TerminalIcon, Trash } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -8,6 +8,7 @@ import { errorMessage } from "../../api/client.ts";
 import * as api from "../../api/index.ts";
 import { Console } from "../../components/console/index.tsx";
 import { StateBadge } from "../../components/statebadge.tsx";
+import { useLiveQuery } from "../../live/index.ts";
 
 const useAction = (fn: (name: string) => Promise<unknown>, label: string) => {
   const qc = useQueryClient();
@@ -22,10 +23,10 @@ const useAction = (fn: (name: string) => Promise<unknown>, label: string) => {
 };
 
 export const LxcList = () => {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading } = useLiveQuery({
     queryKey: ["lxc"],
     queryFn: api.lxc.list,
-    refetchInterval: 5_000,
+    topic: "lxc",
   });
   const start = useAction(api.lxc.start, "Started");
   const stop = useAction(api.lxc.stop, "Stopped");

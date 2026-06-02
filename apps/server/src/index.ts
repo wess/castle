@@ -2,6 +2,7 @@ import { options, router } from "@atlas/server";
 import { ensureAdmin } from "./auth/bootstrap.ts";
 import { config } from "./config.ts";
 import { cors } from "./cors.ts";
+import { startEvents } from "./events/index.ts";
 import { buildRoutes } from "./routes/index.ts";
 import { spa } from "./spa.ts";
 import { init } from "./state.ts";
@@ -57,12 +58,14 @@ const fetchHandler = async (req: Request, server: any): Promise<Response | undef
   });
 };
 
-Bun.serve({
+const server = Bun.serve({
   port: cfg.port,
   hostname: cfg.host,
   fetch: fetchHandler,
   websocket,
 });
+
+startEvents(server);
 
 console.log(`castled listening on http://${cfg.host}:${cfg.port}`);
 if (spaHandler) console.log(`serving web from ${cfg.webRoot}`);

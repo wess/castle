@@ -10,9 +10,28 @@ networks:
 
 volumes:
   pgdata:
+  # Bulk app storage lives on the TerraMaster USB drive (/mnt/terramaster),
+  # not the root NVMe. These are named volumes bind-backed onto that disk; the
+  # host dirs must exist with the owning uid each service runs as (stohr=1000,
+  # tangle=root). See scripts/services-install.sh.
   tangle-repos:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/terramaster/tangle/repos
   tangle-blobs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/terramaster/tangle/blobs
   stohr-blobs:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/terramaster/stohr/blobs
 
 services:
   postgres:
@@ -87,6 +106,15 @@ services:
       dockerfile: Dockerfile
     command: bun src/server.ts
     restart: unless-stopped
+    # The shared stohr image's HEALTHCHECK targets the web port (WEB_PORT/3001,
+    # /api/setup); the API serves on PORT/3000 and has no such route, so override
+    # with a liveness probe: healthy if the API port answers at all.
+    healthcheck:
+      test: ["CMD", "bun", "-e", "fetch('http://127.0.0.1:'+(process.env.PORT||3000)+'/').then(()=>process.exit(0)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
     environment:
       PORT: "3000"
       NODE_ENV: production

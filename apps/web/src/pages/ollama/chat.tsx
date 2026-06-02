@@ -18,6 +18,7 @@ import { MoreHorizontal, Pencil, Plus, Send, Trash } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { errorMessage } from "../../api/client.ts";
 import * as api from "../../api/index.ts";
+import { useLiveQuery } from "../../live/index.ts";
 
 const titleFrom = (text: string): string => {
   const trimmed = text.trim().replace(/\s+/g, " ");
@@ -44,12 +45,14 @@ const blankChat = (model: string): LocalChat => ({ id: null, title: "New chat", 
 
 export const OllamaChat = () => {
   const qc = useQueryClient();
-  const { data: models } = useQuery({ queryKey: ["ollama", "models"], queryFn: api.ollama.list });
-  const { data: chats } = useQuery({
-    queryKey: ["ollama", "chats"],
-    queryFn: api.ollama.listChats,
-    refetchInterval: 15_000,
+  const { data: models } = useLiveQuery({
+    queryKey: ["ollama", "models"],
+    queryFn: api.ollama.list,
+    topic: "ollama:models",
   });
+  // Chat list is per-user (not a broadcast topic); it stays fresh via the
+  // create/update/delete mutations below rather than a poll.
+  const { data: chats } = useQuery({ queryKey: ["ollama", "chats"], queryFn: api.ollama.listChats });
 
   const [active, setActive] = useState<LocalChat>(() => blankChat(""));
   const [input, setInput] = useState("");

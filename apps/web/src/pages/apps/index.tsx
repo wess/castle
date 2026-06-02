@@ -37,6 +37,7 @@ import {
 import { useState } from "react";
 import { errorMessage } from "../../api/client.ts";
 import * as api from "../../api/index.ts";
+import { useLiveQuery } from "../../live/index.ts";
 
 const ICONS: Record<string, LucideIcon> = {
   sparkles: Sparkles,
@@ -57,10 +58,10 @@ const iconOf = (name: string): LucideIcon => ICONS[name] ?? Package;
 export const Apps = () => {
   const qc = useQueryClient();
   const { data: apps } = useQuery({ queryKey: ["apps"], queryFn: api.apps.list });
-  const { data: instances } = useQuery({
+  const { data: instances } = useLiveQuery({
     queryKey: ["apps", "installed"],
     queryFn: api.apps.installed,
-    refetchInterval: 5_000,
+    topic: "apps",
   });
 
   const [picked, setPicked] = useState<api.apps.AppTemplate | null>(null);

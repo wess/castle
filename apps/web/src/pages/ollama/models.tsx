@@ -14,11 +14,12 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Download, RefreshCw, Trash, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { errorMessage } from "../../api/client.ts";
 import * as api from "../../api/index.ts";
+import { useLiveQuery } from "../../live/index.ts";
 
 const formatSize = (bytes: number): string => {
   if (!bytes) return "—";
@@ -51,23 +52,20 @@ export const OllamaModels = () => {
     data: modelList,
     isLoading,
     refetch,
-  } = useQuery({
+  } = useLiveQuery({
     queryKey: ["ollama", "models"],
     queryFn: api.ollama.list,
-    refetchInterval: 10_000,
+    topic: "ollama:models",
   });
-  const { data: status } = useQuery({
+  const { data: status } = useLiveQuery({
     queryKey: ["ollama", "status"],
     queryFn: api.ollama.status,
-    refetchInterval: 5_000,
+    topic: "ollama:status",
   });
-  const { data: pulls } = useQuery({
+  const { data: pulls } = useLiveQuery({
     queryKey: ["ollama", "pulls"],
     queryFn: api.ollama.listPulls,
-    refetchInterval: (q) => {
-      const running = (q.state.data ?? []).some((p) => p.status === "running");
-      return running ? 1_500 : 10_000;
-    },
+    topic: "ollama:pulls",
   });
 
   // Toast on pull completion exactly once per (model, endedAt).

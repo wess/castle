@@ -17,12 +17,13 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { KeyRound, Plus, RefreshCw, Trash, User as UserIcon } from "lucide-react";
 import { useState } from "react";
 import { errorMessage } from "../../api/client.ts";
 import * as api from "../../api/index.ts";
 import { ago } from "../../format.ts";
+import { useLiveQuery } from "../../live/index.ts";
 import { Connections } from "./connections.tsx";
 
 type Result = { provisions: api.users.ProvisionResult[] };
@@ -43,10 +44,10 @@ const summarize = (r: Result, action: string): { message: string; color: string 
 
 export const Users = () => {
   const qc = useQueryClient();
-  const { data: users, isLoading } = useQuery({
+  const { data: users, isLoading } = useLiveQuery({
     queryKey: ["users"],
     queryFn: api.users.list,
-    refetchInterval: 30_000,
+    topic: "users",
   });
 
   const [creating, setCreating] = useState(false);

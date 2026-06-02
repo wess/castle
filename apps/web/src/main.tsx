@@ -7,6 +7,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { App } from "./app.tsx";
 import { AuthProvider } from "./auth/context.tsx";
+import { LiveProvider } from "./live/index.ts";
 
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
@@ -37,7 +38,9 @@ createRoot(root).render(
         <Notifications position="top-right" />
         <BrowserRouter>
           <AuthProvider>
-            <App />
+            <LiveProvider>
+              <App />
+            </LiveProvider>
           </AuthProvider>
         </BrowserRouter>
       </MantineProvider>

@@ -10,6 +10,8 @@ export type Volume = {
 };
 
 export const pools = () => get<Pool[]>("/storage/pools");
+export const addPool = (name: string, path: string) => post<Pool>("/storage/pools", { name, path });
+export const removePool = (name: string) => del(`/storage/pools/${encodeURIComponent(name)}`);
 export const volumes = () => get<Volume[]>("/storage/volumes");
 export const createVolume = (name: string) => post<Volume>(`/storage/volumes`, { name });
 export const removeVolume = (name: string, force = false) => del(`/storage/volumes/${name}?force=${force ? 1 : 0}`);

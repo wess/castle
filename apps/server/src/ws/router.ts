@@ -1,9 +1,10 @@
 import type { ServerWebSocket } from "bun";
+import { eventsMessage } from "../events/index.ts";
 import { authorize } from "./auth.ts";
 import { dockerExecClose, dockerExecMessage, dockerExecOpen } from "./exec/docker.ts";
 import { lxcExecClose, lxcExecMessage, lxcExecOpen } from "./exec/lxc.ts";
 
-export type WsKind = "exec-docker" | "exec-lxc";
+export type WsKind = "exec-docker" | "exec-lxc" | "events";
 
 export type WsData = {
   kind: WsKind;
@@ -32,6 +33,13 @@ export const tryUpgrade = async (req: Request, server: any, secret: string): Pro
   const url = new URL(req.url);
   const path = url.pathname;
 
+  // Single multiplexed event stream — clients subscribe to topics over it.
+  if (path === "/api/events") {
+    if (!(await authorize(url, secret))) return false;
+    const data: WsData = { kind: "events", target: "", cmd: [], cols: 0, rows: 0 };
+    return server.upgrade(req, { data });
+  }
+
   const match = path.match(/^\/api\/(containers|lxc)\/([^/]+)\/exec$/);
   if (!match) return false;
 
@@ -54,14 +62,17 @@ export const tryUpgrade = async (req: Request, server: any, secret: string): Pro
 
 export const websocket = {
   open: (ws: ServerWebSocket<WsData>) => {
+    if (ws.data.kind === "events") return;
     if (ws.data.kind === "exec-docker") dockerExecOpen(ws);
     else lxcExecOpen(ws);
   },
   message: (ws: ServerWebSocket<WsData>, msg: string | Buffer) => {
+    if (ws.data.kind === "events") return eventsMessage(ws, msg);
     if (ws.data.kind === "exec-docker") dockerExecMessage(ws, msg);
     else lxcExecMessage(ws, msg);
   },
   close: (ws: ServerWebSocket<WsData>) => {
+    if (ws.data.kind === "events") return;
     if (ws.data.kind === "exec-docker") dockerExecClose(ws);
     else lxcExecClose(ws);
   },

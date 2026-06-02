@@ -1,9 +1,9 @@
 import { Card, Stack, Table, Text, Title } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
 import * as api from "../../api/index.ts";
+import { useLiveQuery } from "../../live/index.ts";
 
 export const Networks = () => {
-  const { data } = useQuery({ queryKey: ["networks"], queryFn: api.networks.list, refetchInterval: 10_000 });
+  const { data } = useLiveQuery({ queryKey: ["networks"], queryFn: api.networks.list, topic: "networks" });
 
   return (
     <Stack gap="lg">

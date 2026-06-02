@@ -1,6 +1,6 @@
 import { ActionIcon, Anchor, Button, Card, Group, Stack, Table, Text, Title, Tooltip } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Play, Plus, RotateCw, Square, Terminal as TerminalIcon, Trash } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -9,6 +9,7 @@ import * as api from "../../api/index.ts";
 import { Console } from "../../components/console/index.tsx";
 import { StateBadge } from "../../components/statebadge.tsx";
 import { ago, shortId } from "../../format.ts";
+import { useLiveQuery } from "../../live/index.ts";
 
 const useAction = (fn: (id: string) => Promise<unknown>, label: string) => {
   const qc = useQueryClient();
@@ -23,10 +24,10 @@ const useAction = (fn: (id: string) => Promise<unknown>, label: string) => {
 };
 
 export const Containers = () => {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading } = useLiveQuery({
     queryKey: ["containers"],
     queryFn: api.containers.list,
-    refetchInterval: 4_000,
+    topic: "containers",
   });
 
   const start = useAction(api.containers.start, "Started");

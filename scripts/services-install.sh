@@ -82,6 +82,17 @@ fi
 # Mirror the env file into the compose dir so `docker compose` picks it up.
 ln -sf "$ENV_FILE" "$SVC_DIR/.env"
 
+# 4b. Bulk app storage (tangle/stohr blobs + repos) is bind-backed onto the
+# TerraMaster drive at /mnt/terramaster (see compose.yaml). The bind targets
+# must exist with the uid each service runs as before `compose up`.
+BULK=/mnt/terramaster
+if mountpoint -q "$BULK"; then
+  install -d -o 1000 -g 1000 "$BULK/stohr/blobs"
+  install -d -o 0 -g 0 "$BULK/tangle/blobs" "$BULK/tangle/repos"
+else
+  echo "warning: $BULK not mounted — app blob storage will not be on the TerraMaster drive"
+fi
+
 # 5. Bring the stack up.
 log "compose up"
 cd "$SVC_DIR"

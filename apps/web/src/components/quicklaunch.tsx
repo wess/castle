@@ -1,7 +1,7 @@
 import { Anchor, Card, Group, Stack, Text, ThemeIcon } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
 import { Cloud, ExternalLink, GitBranch, Package } from "lucide-react";
 import * as api from "../api/index.ts";
+import { useLiveQuery } from "../live/index.ts";
 
 const iconFor = (appId: string) => {
   if (appId === "tangle") return GitBranch;
@@ -21,10 +21,10 @@ const labelFor = (appId: string): string => {
  * silently when the user is already authenticated to Castle.
  */
 export const QuickLaunch = () => {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading } = useLiveQuery({
     queryKey: ["connections"],
     queryFn: api.connections.list,
-    refetchInterval: 60_000,
+    topic: "connections",
   });
 
   if (isLoading) return null;

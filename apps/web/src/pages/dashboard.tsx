@@ -1,16 +1,16 @@
 import { Card, Grid, Group, Stack, Text, Title } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
 import { Boxes, Cpu, HardDrive, MemoryStick, Server } from "lucide-react";
 import * as api from "../api/index.ts";
 import { QuickLaunch } from "../components/quicklaunch.tsx";
 import { Stat } from "../components/stat.tsx";
 import { bytes, duration, percent } from "../format.ts";
+import { useLiveQuery } from "../live/index.ts";
 
 export const Dashboard = () => {
-  const stats = useQuery({ queryKey: ["host"], queryFn: api.host.host, refetchInterval: 5_000 });
-  const engine = useQuery({ queryKey: ["engine"], queryFn: api.host.engine, refetchInterval: 15_000 });
-  const containers = useQuery({ queryKey: ["containers"], queryFn: api.containers.list, refetchInterval: 5_000 });
-  const lxc = useQuery({ queryKey: ["lxc"], queryFn: api.lxc.list, refetchInterval: 5_000 });
+  const stats = useLiveQuery({ queryKey: ["host"], queryFn: api.host.host, topic: "host" });
+  const engine = useLiveQuery({ queryKey: ["engine"], queryFn: api.host.engine, topic: "engine" });
+  const containers = useLiveQuery({ queryKey: ["containers"], queryFn: api.containers.list, topic: "containers" });
+  const lxc = useLiveQuery({ queryKey: ["lxc"], queryFn: api.lxc.list, topic: "lxc" });
 
   const h = stats.data;
   const runningCt = containers.data?.filter((c) => c.state === "running").length ?? 0;

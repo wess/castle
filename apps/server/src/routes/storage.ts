@@ -1,16 +1,36 @@
 import { del, get, json, pipe, post } from "@atlas/server";
 import { volumes } from "@castle/docker";
-import { dir, lvm, zfs } from "@castle/storage";
+import { pools as registry } from "../db/index.ts";
 import { app } from "../state.ts";
+import { collectPools, resolveDir } from "../storage/index.ts";
+
+// Pool names map 1:1 to a `dir:<name>` id and show in the UI, so keep them tame.
+const NAME_RE = /^[a-z0-9][a-z0-9.-]*$/i;
 
 export const storageRoutes = [
   get(
     "/api/storage/pools",
+    pipe(async (c) => json(c, 200, await collectPools(app().db))),
+  ),
+
+  post(
+    "/api/storage/pools",
     pipe(async (c) => {
-      const [z, l, root] = await Promise.all([zfs.pools(), lvm.pools(), dir.fromPath("root", "/")]);
-      const pools = [...z, ...l];
-      if (root) pools.push(root);
-      return json(c, 200, pools);
+      const body = (await c.request.json().catch(() => ({}))) as { name?: unknown; path?: unknown };
+      const name = typeof body.name === "string" ? body.name.trim() : "";
+      const path = typeof body.path === "string" ? body.path.trim() : "";
+      if (!NAME_RE.test(name)) return json(c, 400, { error: "invalid pool name" });
+      if (!path.startsWith("/")) return json(c, 400, { error: "path must be absolute" });
+      await registry.add(app().db, name, path);
+      return json(c, 201, await resolveDir(name, path));
+    }),
+  ),
+
+  del(
+    "/api/storage/pools/:name",
+    pipe(async (c) => {
+      await registry.remove(app().db, `dir:${c.params.name!}`);
+      return json(c, 200, { ok: true });
     }),
   ),
 

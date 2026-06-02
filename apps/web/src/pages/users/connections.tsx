@@ -15,18 +15,19 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plug2, Plus, ShieldCheck, Trash } from "lucide-react";
 import { useState } from "react";
 import { errorMessage } from "../../api/client.ts";
 import * as api from "../../api/index.ts";
+import { useLiveQuery } from "../../live/index.ts";
 
 export const Connections = () => {
   const qc = useQueryClient();
-  const { data, isLoading } = useQuery({
+  const { data, isLoading } = useLiveQuery({
     queryKey: ["connections"],
     queryFn: api.connections.list,
-    refetchInterval: 60_000,
+    topic: "connections",
   });
 
   const [adding, setAdding] = useState(false);

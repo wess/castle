@@ -1,7 +1,7 @@
 import { ActionIcon, Group, Menu, Text, Tooltip } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
 import { ExternalLink, Grid3X3 } from "lucide-react";
 import * as api from "../api/index.ts";
+import { useLiveQuery } from "../live/index.ts";
 
 const labelFor = (appId: string): string => {
   if (appId === "tangle") return "Tangle";
@@ -16,10 +16,10 @@ const labelFor = (appId: string): string => {
  * password prompt and finalises the SSO handshake.
  */
 export const AppSwitcher = () => {
-  const { data } = useQuery({
+  const { data } = useLiveQuery({
     queryKey: ["connections"],
     queryFn: api.connections.list,
-    refetchInterval: 60_000,
+    topic: "connections",
   });
 
   const items = (data ?? []).filter((c) => c.hostname);
