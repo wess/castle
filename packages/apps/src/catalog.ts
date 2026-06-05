@@ -16,13 +16,6 @@ export const catalog: AppTemplate[] = [
         image: "ollama/ollama:latest",
         ports: [{ container: 11434, primary: true }],
         volumes: [{ name: "data", target: "/root/.ollama" }],
-        // q8_0 KV cache halves attention VRAM with negligible quality loss,
-        // letting more layers/context stay on small (8GB-class) GPUs. Requires
-        // flash attention, so force it on rather than relying on per-model auto.
-        env: {
-          OLLAMA_FLASH_ATTENTION: "1",
-          OLLAMA_KV_CACHE_TYPE: "q8_0",
-        },
         gpu: true,
       },
     ],
@@ -113,72 +106,6 @@ export const catalog: AppTemplate[] = [
         volumes: [{ name: "blobs", target: "/data/blobs" }],
         dependsOn: ["db"],
         generateSecrets: ["SECRET", "CASTLE_ADMIN_TOKEN"],
-      },
-    ],
-  },
-  {
-    id: "tandem",
-    name: "Tandem",
-    description: "Self-hosted team chat where humans and AI agents collaborate.",
-    category: "AI",
-    icon: "messages-square",
-    docs: "https://github.com/wess/tandem",
-    multi: true,
-    services: [
-      {
-        key: "db",
-        role: "db",
-        image: "postgres:16-alpine",
-        env: {
-          POSTGRES_DB: "tandem",
-          POSTGRES_USER: "postgres",
-          POSTGRES_PASSWORD: "${SECRET:POSTGRES_PASSWORD}",
-        },
-        volumes: [{ name: "pgdata", target: "/var/lib/postgresql/data" }],
-        generateSecrets: ["POSTGRES_PASSWORD"],
-      },
-      {
-        key: "app",
-        role: "primary",
-        image: "wess/tandem:main",
-        ports: [{ container: 3000, primary: true }],
-        env: {
-          DATABASE_URL: "postgres://postgres:${SECRET:POSTGRES_PASSWORD}@${INSTANCE}-db:5432/tandem",
-          AUTH_SECRET: "${SECRET:AUTH_SECRET}",
-          // OIDC relying-party config — Castle injects these at install time.
-          SSO_ISSUER: "${INPUT:SSO_ISSUER}",
-          SSO_CLIENT_ID: "${INPUT:SSO_CLIENT_ID}",
-          SSO_CLIENT_SECRET: "${INPUT:SSO_CLIENT_SECRET}",
-          // LLM providers — operator supplies at install (see prompts).
-          ANTHROPIC_API_KEY: "${INPUT:ANTHROPIC_API_KEY}",
-          OPENAI_API_KEY: "${INPUT:OPENAI_API_KEY}",
-          OLLAMA_URL: "${INPUT:OLLAMA_URL}",
-        },
-        dependsOn: ["db"],
-        generateSecrets: ["AUTH_SECRET"],
-      },
-    ],
-    prompts: [
-      {
-        key: "ANTHROPIC_API_KEY",
-        label: "Anthropic API key",
-        type: "password",
-        placeholder: "sk-ant-…",
-        required: false,
-      },
-      {
-        key: "OPENAI_API_KEY",
-        label: "OpenAI API key",
-        type: "password",
-        placeholder: "sk-…",
-        required: false,
-      },
-      {
-        key: "OLLAMA_URL",
-        label: "Ollama URL",
-        type: "text",
-        default: "http://ollama.local",
-        required: false,
       },
     ],
   },

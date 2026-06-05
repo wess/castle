@@ -7,7 +7,7 @@ import * as idpClients from "../idp/clients.ts";
 import { app } from "../state.ts";
 import { provisionAllUsersToConnection } from "../users/provision.ts";
 
-const USER_AWARE_APPS = new Set(["tangle", "stohr", "tandem"]);
+const USER_AWARE_APPS = new Set(["tangle", "stohr"]);
 
 const NAME_RE = /^[a-z][a-z0-9-]{0,30}$/;
 
