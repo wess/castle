@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Documentation — Castle</title>
+    <meta name="description" content="Documentation for Castle: architecture, getting started, deployment, the apps catalog, routing, Ollama, the MCP server, GPU passthrough, the REST/WS API, and the CLI." />
+    <link rel="stylesheet" href="styles.css" />
+    <style>:root{--accent:#d9a441;--accent2:#7b8aa3}</style>
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="wrap">
+        <a class="brand" href="index.html"><span class="mark">♜</span> Castle</a>
+        <button class="navtoggle" aria-label="Menu" data-nav>☰</button>
+        <div class="navlinks" data-navlinks>
+          <a href="index.html#features">Features</a>
+          <a href="index.html#architecture">Architecture</a>
+          <a href="docs.html">Docs</a>
+          <a class="btn primary" href="https://github.com/wess/castle">GitHub</a>
+        </div>
+      </div>
+    </nav>
+
+    <header class="dochero">
+      <div class="wrap">
+        <div class="eyebrow">Documentation</div>
+        <h2 style="font-size: clamp(28px, 5vw, 40px); font-weight: 800; letter-spacing: -0.02em">Everything about Castle.</h2>
+        <p class="sub">
+          The full reference lives as Markdown in the <code>docs/</code> folder. Start with getting started, then dive into
+          the architecture and deployment. Each card links straight to the source document.
+        </p>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <div class="docsection">Get going</div>
+      <div class="docgrid">
+        <a class="doccard" href="../docs/README.md">
+          <div class="t"><span class="ico">📖</span> Overview</div>
+          <p>What Castle is, the doc map, and the pieces at a glance.</p>
+        </a>
+        <a class="doccard" href="../docs/getting-started.md">
+          <div class="t"><span class="ico">🚀</span> Getting started</div>
+          <p>Local dev, the first login, and skipping auth for development.</p>
+        </a>
+        <a class="doccard" href="../docs/deploy.md">
+          <div class="t"><span class="ico">📦</span> Deploy</div>
+          <p>The production deploy walkthrough and what install.sh touches on the host.</p>
+        </a>
+      </div>
+
+      <div class="docsection">Understand it</div>
+      <div class="docgrid">
+        <a class="doccard" href="../docs/architecture.md">
+          <div class="t"><span class="ico">🏗️</span> Architecture</div>
+          <p>How the daemon, web SPA, CLI, and host adapters fit together.</p>
+        </a>
+        <a class="doccard" href="../docs/conventions.md">
+          <div class="t"><span class="ico">📐</span> Conventions</div>
+          <p>Code style, file naming, and the functional design rules.</p>
+        </a>
+      </div>
+
+      <div class="docsection">Features</div>
+      <div class="docgrid">
+        <a class="doccard" href="../docs/apps.md">
+          <div class="t"><span class="ico">🧩</span> Apps</div>
+          <p>The 1-click installs, the catalog, and multi-service installers.</p>
+        </a>
+        <a class="doccard" href="../docs/routing.md">
+          <div class="t"><span class="ico">📡</span> Routing</div>
+          <p>Hosts and routes, nginx vhost generation, and <code>*.local</code> mDNS.</p>
+        </a>
+        <a class="doccard" href="../docs/ollama.md">
+          <div class="t"><span class="ico">🦙</span> Ollama</div>
+          <p>The Ollama integration: chat, models, and cloud.</p>
+        </a>
+        <a class="doccard" href="../docs/mcp.md">
+          <div class="t"><span class="ico">🤖</span> MCP</div>
+          <p>The built-in MCP server, the tool list, and client config.</p>
+        </a>
+        <a class="doccard" href="../docs/gpu.md">
+          <div class="t"><span class="ico">🎛️</span> GPU</div>
+          <p>NVIDIA driver and container toolkit setup for passthrough.</p>
+        </a>
+      </div>
+
+      <div class="docsection">Reference</div>
+      <div class="docgrid">
+        <a class="doccard" href="../docs/api.md">
+          <div class="t"><span class="ico">🔗</span> API</div>
+          <p>The REST and WebSocket reference — the full contract.</p>
+        </a>
+        <a class="doccard" href="../docs/cli.md">
+          <div class="t"><span class="ico">⌨️</span> CLI</div>
+          <p>The <code>castle</code> command reference.</p>
+        </a>
+      </div>
+    </main>
+
+    <footer style="margin-top: 60px">
+      <div class="wrap">
+        <a class="brand" href="index.html"><span class="mark">♜</span> Castle</a>
+        <div class="links">
+          <a href="index.html">Home</a>
+          <a href="../docs/README.md">Docs source</a>
+          <a href="https://github.com/wess/atlas">Atlas</a>
+          <a href="https://github.com/wess/castle">GitHub</a>
+        </div>
+        <span>Apache 2.0 · © 2026</span>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>

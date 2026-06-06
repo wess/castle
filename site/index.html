@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Castle — a homelab control plane for a single Linux box</title>
+    <meta
+      name="description"
+      content="Castle is a homelab control plane for one Linux box. Manage Docker containers, LXC system containers, networks, and storage; install apps in one click; route *.local hostnames; chat with Ollama; and drive it all from a built-in MCP server. Bun + TypeScript, built on Atlas."
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <style>:root{--accent:#d9a441;--accent2:#7b8aa3}</style>
+  </head>
+  <body>
+    <!-- nav -->
+    <nav class="nav">
+      <div class="wrap">
+        <a class="brand" href="index.html"><span class="mark">♜</span> Castle</a>
+        <button class="navtoggle" aria-label="Menu" data-nav>☰</button>
+        <div class="navlinks" data-navlinks>
+          <a href="#features">Features</a>
+          <a href="#architecture">Architecture</a>
+          <a href="docs.html">Docs</a>
+          <a class="btn primary" href="https://github.com/wess/castle">GitHub</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- hero -->
+    <header class="hero">
+      <div class="wrap">
+        <span class="pill"><span class="dot"></span> Single-node · self-hosted · built on Atlas</span>
+        <h1>A homelab control plane for <span class="accent">a single Linux box</span>.</h1>
+        <p class="lead">
+          Castle manages Docker containers, LXC system containers, networks, and storage from one always-on daemon —
+          with a 1-click apps catalog, <code>*.local</code> routing, an Ollama console, and a built-in MCP server so AI
+          agents can drive your homelab.
+        </p>
+        <div class="cta">
+          <a class="btn primary" href="#start">Get started</a>
+          <a class="btn ghost" href="https://github.com/wess/castle">View on GitHub →</a>
+        </div>
+
+        <!-- console mockup -->
+        <div class="mock">
+          <div class="bar">
+            <span class="hash">⌘</span><span>castle</span>
+            <span class="muted" style="font-size: 13px">· vegeta.local</span>
+            <span class="dots"><i></i><i></i><i></i></span>
+          </div>
+          <div class="body">
+            <div class="msg human">
+              <div class="av">🧑</div>
+              <div>
+                <div class="who">You</div>
+                <div class="txt">Install Jellyfin and route it at jellyfin.local</div>
+              </div>
+            </div>
+            <div class="msg">
+              <div class="av" style="background: linear-gradient(135deg, #d9a441, #a87a1f)">♜</div>
+              <div>
+                <div class="who">Castle <small>apps · 1-click</small></div>
+                <div class="txt">
+                  Pulling image, creating the container, wiring the volume… then generating the nginx vhost.
+                </div>
+              </div>
+            </div>
+            <div class="msg">
+              <div class="av">📡</div>
+              <div>
+                <div class="who">Routing <small>mDNS · nginx</small></div>
+                <div class="txt">Published <span class="men">jellyfin.local</span> over avahi and reloaded nginx. Live now.</div>
+              </div>
+            </div>
+            <div class="msg">
+              <div class="av" style="background: linear-gradient(135deg, #d9a441, #a87a1f)">♜</div>
+              <div>
+                <div class="who">Castle <small>done</small></div>
+                <div class="typing"><i></i><i></i><i></i> container healthy</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- features -->
+    <section class="block" id="features">
+      <div class="wrap">
+        <div class="eyebrow">Features</div>
+        <h2>Proxmox-style control, sized for one box.</h2>
+        <p class="sub">Everything to run a homelab on a single Linux host — workloads, network, storage, and AI access in one daemon.</p>
+        <div class="grid">
+          <div class="card">
+            <div class="ico">📦</div>
+            <h3>Workloads</h3>
+            <p>Full Docker container CRUD plus LXC system containers, with a web exec console over xterm.js and WebSockets.</p>
+          </div>
+          <div class="card">
+            <div class="ico">💿</div>
+            <h3>Images</h3>
+            <p>List, pull, and remove images. Pulls run as background jobs with live progress so you never block the UI.</p>
+          </div>
+          <div class="card">
+            <div class="ico">🌐</div>
+            <h3>Network</h3>
+            <p>Manage Docker networks, host bridges, and port-forwards — the plumbing your services need, in one place.</p>
+          </div>
+          <div class="card">
+            <div class="ico">🗄️</div>
+            <h3>Storage</h3>
+            <p>ZFS, LVM, and directory pools alongside Docker volumes, so capacity is managed the way your host expects.</p>
+          </div>
+          <div class="card">
+            <div class="ico">🧩</div>
+            <h3>Apps catalog</h3>
+            <p>1-click installs for Ollama, Tangle, Stohr, Jellyfin, Vaultwarden and more — multi-service installs included.</p>
+          </div>
+          <div class="card">
+            <div class="ico">📡</div>
+            <h3>Routing</h3>
+            <p><code>*.local</code> mDNS aliases plus auto-generated nginx vhosts, so every app gets a clean hostname.</p>
+          </div>
+          <div class="card">
+            <div class="ico">🦙</div>
+            <h3>Ollama console</h3>
+            <p>Chat with persistent history and pull models as durable background jobs — local LLMs without the busywork.</p>
+          </div>
+          <div class="card">
+            <div class="ico">🤖</div>
+            <h3>Built-in MCP</h3>
+            <p>A built-in MCP server exposes 16 tools to AI agents like Claude and Cline, so they can drive your homelab.</p>
+          </div>
+          <div class="card">
+            <div class="ico">🎛️</div>
+            <h3>GPU passthrough</h3>
+            <p>NVIDIA passthrough via Docker DeviceRequests, managed by Castle, for AI workloads and transcoding.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- architecture -->
+    <section class="block" id="architecture">
+      <div class="wrap">
+        <div class="eyebrow">Architecture</div>
+        <h2>One daemon, three faces.</h2>
+        <div class="split">
+          <ul>
+            <li><span class="ck">✦</span><span><b>castled</b> — a Bun daemon exposing a REST + WebSocket API, routes, the MCP server, and background jobs.</span></li>
+            <li><span class="ck">✦</span><span><b>web</b> — a React/Mantine SPA for the dashboard, consoles, and 1-click installs.</span></li>
+            <li><span class="ck">✦</span><span><b>castle CLI</b> — the same control plane from your terminal.</span></li>
+            <li><span class="ck">✦</span><span><b>Host adapters</b> — Docker over its unix socket, the <code>lxc-*</code> binaries, nginx vhost generation, and avahi mDNS.</span></li>
+            <li><span class="ck">✦</span><span><b>Auth</b> — JWT with a single admin, or an optional auth-disabled mode for trusted dev.</span></li>
+          </ul>
+          <div class="diagram">     castled (Bun daemon)
+              │
+   REST  ·  WS  ·  MCP (16 tools)
+              │
+    ┌─────────┼──────────┐
+  Docker     LXC      nginx
+ (socket) (lxc-*)   (vhosts)
+              │
+       avahi · Ollama
+        (mDNS)  (HTTP)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- get started -->
+    <section class="block" id="start">
+      <div class="wrap">
+        <div class="eyebrow">Get started</div>
+        <h2>Running in a few minutes.</h2>
+        <p class="sub">Requires Bun. The first sign-up becomes the admin; castled binds on :4280 and the web dev server on :5173.</p>
+        <div class="code" style="margin-top: 32px; max-width: 720px">
+          <div class="top">
+            <span>terminal</span>
+            <button class="copy" data-copy>Copy</button>
+          </div>
+          <pre data-code><span class="c"># 1. install + configure</span>
+bun install
+cp env.example .env
+
+<span class="c"># 2. run (castled :4280, web :5173)</span>
+bun run dev
+
+<span class="c"># 3. ship it to your box (SSH_HOST/USER/PASS in .env)</span>
+bun run deploy</pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- cta band -->
+    <section class="band">
+      <div class="wrap">
+        <h2>Run your homelab from one place.</h2>
+        <p>Open source under Apache 2.0. Self-host Castle on your box and keep your containers, data, and keys yours.</p>
+        <div class="cta">
+          <a class="btn primary" href="docs.html">Read the docs</a>
+          <a class="btn ghost" href="https://github.com/wess/castle">View on GitHub →</a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">
+        <a class="brand" href="index.html"><span class="mark">♜</span> Castle</a>
+        <div class="links">
+          <a href="docs.html">Docs</a>
+          <a href="../docs/getting-started.md">Getting started</a>
+          <a href="../docs/deploy.md">Deploy</a>
+          <a href="https://github.com/wess/atlas">Atlas</a>
+          <a href="https://github.com/wess/castle">GitHub</a>
+        </div>
+        <span>Apache 2.0 · © 2026</span>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
