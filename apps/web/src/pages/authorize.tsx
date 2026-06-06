@@ -1,5 +1,5 @@
 import { Alert, Button, Center, Loader, Stack, Text } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getToken } from "../auth/storage.ts";
 
 type ClientInfo = {
@@ -31,18 +31,27 @@ export const Authorize = () => {
   const [info, setInfo] = useState<AuthorizeInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const params = new URLSearchParams(window.location.search);
-  const requiredKeys = [
-    "response_type",
-    "client_id",
-    "redirect_uri",
-    "scope",
-    "code_challenge",
-    "code_challenge_method",
-  ];
-  const missing = requiredKeys.filter((k) => !params.get(k));
+  // The consent exchange must run exactly once per page load. It was previously
+  // keyed on recreated-every-render values (a fresh params object + arrays), so
+  // the effect re-fired on every render and setInfo/setPhase re-rendered it —
+  // an infinite /oauth/authorize/info + /approve burst that never navigated out
+  // (the SSO "redirect loop"). A ref guard pins it to a single run.
+  const ran = useRef(false);
 
   useEffect(() => {
+    if (ran.current) return;
+    ran.current = true;
+
+    const params = new URLSearchParams(window.location.search);
+    const requiredKeys = [
+      "response_type",
+      "client_id",
+      "redirect_uri",
+      "scope",
+      "code_challenge",
+      "code_challenge_method",
+    ];
+    const missing = requiredKeys.filter((k) => !params.get(k));
     if (missing.length > 0) {
       setError(`Missing required parameter(s): ${missing.join(", ")}`);
       setPhase("error");
@@ -96,7 +105,7 @@ export const Authorize = () => {
       }
     };
     void run();
-  }, [missing.length, requiredKeys, params.get, params.toString, missing.join]);
+  }, []);
 
   if (phase === "error") {
     return (
