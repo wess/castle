@@ -13,6 +13,12 @@ const webRoot = env("WEB_ROOT", { default: "" });
 // passes to apps as SSO_ISSUER. Set this to "http://castle.local" on
 // production deploys so relying parties can reach the JWKS over mDNS.
 const publicUrl = env("CASTLE_PUBLIC_URL", { default: "http://castle.local" });
+// Shared M2M secret. Apps Castle provisions into receive this as
+// CASTLE_ADMIN_TOKEN and present it back on /api/castle/* calls. The MCP
+// write tool (castle.users.provision) reuses the same token so an AI client
+// must hold the operator's M2M secret — not just an MCP read token — before
+// it can create accounts and fan them out.
+const adminToken = env("CASTLE_ADMIN_TOKEN", { default: "" });
 
 export const config = () => ({
   port: port.read(),
@@ -25,4 +31,5 @@ export const config = () => ({
   adminPassword: adminPassword.read(),
   webRoot: webRoot.read(),
   publicUrl: publicUrl.read(),
+  adminToken: adminToken.read(),
 });
