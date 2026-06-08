@@ -45,6 +45,7 @@ const fetchHandler = async (req: Request, server: any): Promise<Response | undef
     !isAuthorizePage &&
     (url.pathname.startsWith("/api") ||
       url.pathname === "/api" ||
+      url.pathname === "/mcp" ||
       url.pathname.startsWith("/oauth/") ||
       url.pathname.startsWith("/.well-known/"))
   ) {

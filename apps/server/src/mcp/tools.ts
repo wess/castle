@@ -21,6 +21,10 @@ export type Tool = {
 
 const tool = (t: Tool): Tool => t;
 
+// Imported below the type/`tool` definitions to avoid a circular hazard: the
+// control-plane tool files import `Tool` from here.
+import { controlPlaneReadTools, controlPlaneWriteTools } from "./domain/index.ts";
+
 const ollamaClient = async () => {
   const [url, apiKey] = await Promise.all([
     settings.get(app().db, "ollama_url"),
@@ -240,4 +244,17 @@ export const tools: Tool[] = [
     inputSchema: { type: "object", properties: {} },
     handler: async () => ollamaModels.list(await ollamaClient()),
   }),
+
+  // Control-plane domain tools (task M6.3): user directory, OIDC clients,
+  // and health. Read-only — they ship in the default catalog.
+  ...controlPlaneReadTools,
 ];
+
+// Mutating control-plane tools (currently castle.users.provision). Kept out
+// of the default `tools` list so they are never advertised unless a caller
+// explicitly opts in via `allTools(true)`. Each still enforces its own
+// CASTLE_ADMIN_TOKEN check at call time — the gate here only controls
+// discovery.
+export const writeTools: Tool[] = [...controlPlaneWriteTools];
+
+export const allTools = (includeWrite: boolean): Tool[] => (includeWrite ? [...tools, ...writeTools] : tools);

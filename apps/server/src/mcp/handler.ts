@@ -14,9 +14,12 @@ type JsonRpcResponse = {
   error?: { code: number; message: string };
 };
 
-const findTool = (name: string): Tool | undefined => tools.find((t) => t.name === name);
+const findTool = (set: Tool[], name: string): Tool | undefined => set.find((t) => t.name === name);
 
-export const handle = async (req: JsonRpcRequest): Promise<JsonRpcResponse> => {
+// `set` defaults to the read-only catalog. The /mcp route passes the expanded
+// set (reads + writes) only when write tools have been explicitly enabled, so
+// a request can never reach a write handler that wasn't advertised.
+export const handle = async (req: JsonRpcRequest, set: Tool[] = tools): Promise<JsonRpcResponse> => {
   const id = req.id ?? 0;
 
   if (req.method === "initialize") {
@@ -40,7 +43,7 @@ export const handle = async (req: JsonRpcRequest): Promise<JsonRpcResponse> => {
       jsonrpc: "2.0",
       id,
       result: {
-        tools: tools.map((t) => ({
+        tools: set.map((t) => ({
           name: t.name,
           description: t.description,
           inputSchema: t.inputSchema,
@@ -51,7 +54,7 @@ export const handle = async (req: JsonRpcRequest): Promise<JsonRpcResponse> => {
 
   if (req.method === "tools/call") {
     const p = req.params as { name: string; arguments?: Record<string, unknown> };
-    const t = findTool(p.name);
+    const t = findTool(set, p.name);
     if (!t) return { jsonrpc: "2.0", id, error: { code: -32601, message: `unknown tool: ${p.name}` } };
     try {
       const result = await t.handler(p.arguments ?? {});
@@ -75,5 +78,5 @@ export const handle = async (req: JsonRpcRequest): Promise<JsonRpcResponse> => {
   return { jsonrpc: "2.0", id, error: { code: -32601, message: `method not found: ${req.method}` } };
 };
 
-export const toolSummaries = (): Array<{ name: string; description: string }> =>
-  tools.map((t) => ({ name: t.name, description: t.description }));
+export const toolSummaries = (set: Tool[] = tools): Array<{ name: string; description: string }> =>
+  set.map((t) => ({ name: t.name, description: t.description }));
