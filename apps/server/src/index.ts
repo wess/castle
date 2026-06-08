@@ -11,7 +11,10 @@ import { tryUpgrade, websocket } from "./ws/router.ts";
 const cfg = config();
 const state = await init();
 
-await ensureAdmin(state.db, cfg.adminEmail, cfg.adminPassword);
+// Only auto-create an admin when a password is explicitly configured. With no
+// CASTLE_ADMIN_PASSWORD set, Castle starts empty and the first visitor signs up
+// at /signup (becoming the owner).
+if (cfg.adminPassword) await ensureAdmin(state.db, cfg.adminEmail, cfg.adminPassword);
 
 const preflight = options("/*", async (c) => {
   const after = cors(cfg.webOrigin)(c);

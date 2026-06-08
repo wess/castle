@@ -7,8 +7,11 @@ export type AuthUser = { id: number; email: string } | null;
 type AuthState = {
   user: AuthUser;
   authRequired: boolean;
+  needsSetup: boolean;
+  ollamaEnabled: boolean;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (identifier: string, password: string) => Promise<void>;
+  signUp: (input: api.auth.SignupInput) => Promise<void>;
   signOut: () => Promise<void> | void;
   refresh: () => Promise<void>;
 };
@@ -18,6 +21,8 @@ const Ctx = createContext<AuthState | null>(null);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AuthUser>(null);
   const [authRequired, setAuthRequired] = useState(true);
+  const [needsSetup, setNeedsSetup] = useState(false);
+  const [ollamaEnabled, setOllamaEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -25,6 +30,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const status = await api.settings.status();
       setAuthRequired(status.authRequired);
+      setNeedsSetup(status.needsSetup ?? false);
+      setOllamaEnabled(status.ollama ?? false);
       if (!status.authRequired && status.user) {
         setUser(status.user);
         return;
@@ -59,10 +66,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => window.removeEventListener("castle:auth-expired", onExpired);
   }, [authRequired]);
 
-  const signIn = useCallback(async (email: string, password: string) => {
-    const res = await api.auth.login(email, password);
+  const signIn = useCallback(async (identifier: string, password: string) => {
+    const res = await api.auth.login(identifier, password);
     setToken(res.token);
     setUser(res.user);
+  }, []);
+
+  const signUp = useCallback(async (input: api.auth.SignupInput) => {
+    const res = await api.auth.signup(input);
+    setToken(res.token);
+    setUser(res.user);
+    setNeedsSetup(false);
   }, []);
 
   const signOut = useCallback(async () => {
@@ -74,7 +88,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [authRequired]);
 
   return (
-    <Ctx.Provider value={{ user, authRequired, loading, signIn, signOut, refresh: load }}>{children}</Ctx.Provider>
+    <Ctx.Provider
+      value={{ user, authRequired, needsSetup, ollamaEnabled, loading, signIn, signUp, signOut, refresh: load }}
+    >
+      {children}
+    </Ctx.Provider>
   );
 };
 

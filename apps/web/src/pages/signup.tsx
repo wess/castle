@@ -1,32 +1,24 @@
-import {
-  Box,
-  Button,
-  Card,
-  Center,
-  Group,
-  PasswordInput,
-  Stack,
-  Text,
-  TextInput,
-  ThemeIcon,
-  Title,
-} from "@mantine/core";
+import { Box, Button, Card, Center, Group, PasswordInput, Stack, Text, TextInput, ThemeIcon, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { Castle } from "lucide-react";
 import { useState } from "react";
 import { errorMessage } from "../api/client.ts";
 import { useAuth } from "../auth/context.tsx";
 
-export const Login = () => {
-  const { signIn } = useAuth();
+const USERNAME_RE = /^[a-z0-9_]{3,32}$/;
+
+export const Signup = () => {
+  const { signUp } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const form = useForm({
-    initialValues: { identifier: "", password: "" },
+    initialValues: { username: "", email: "", password: "", name: "" },
     validate: {
-      identifier: (v) => (v.length === 0 ? "required" : null),
-      password: (v) => (v.length === 0 ? "required" : null),
+      username: (v) =>
+        USERNAME_RE.test(v.trim().toLowerCase()) ? null : "3-32 chars: lowercase letters, digits, underscore",
+      email: (v) => (v.length === 0 || /.+@.+\..+/.test(v) ? null : "invalid email"),
+      password: (v) => (v.length >= 8 ? null : "at least 8 characters"),
     },
   });
 
@@ -38,9 +30,9 @@ export const Login = () => {
             <ThemeIcon size={48} variant="light" radius="md">
               <Castle size={28} />
             </ThemeIcon>
-            <Title order={2}>Castle</Title>
+            <Title order={2}>Welcome to Castle</Title>
             <Text size="sm" c="dimmed">
-              Sign in to manage this host
+              Create the owner account for this host
             </Text>
           </Stack>
 
@@ -50,7 +42,12 @@ export const Login = () => {
                 setSubmitting(true);
                 setError(null);
                 try {
-                  await signIn(v.identifier, v.password);
+                  await signUp({
+                    username: v.username.trim().toLowerCase(),
+                    password: v.password,
+                    email: v.email.trim() || undefined,
+                    name: v.name.trim() || undefined,
+                  });
                 } catch (e) {
                   setError(errorMessage(e));
                 } finally {
@@ -59,12 +56,15 @@ export const Login = () => {
               })}
             >
               <Stack gap="md">
+                <TextInput label="Username" autoComplete="username" {...form.getInputProps("username")} />
                 <TextInput
-                  label="Username or email"
-                  autoComplete="username"
-                  {...form.getInputProps("identifier")}
+                  label="Email"
+                  description="Optional on a private network"
+                  autoComplete="email"
+                  {...form.getInputProps("email")}
                 />
-                <PasswordInput label="Password" autoComplete="current-password" {...form.getInputProps("password")} />
+                <TextInput label="Display name" description="Optional" {...form.getInputProps("name")} />
+                <PasswordInput label="Password" autoComplete="new-password" {...form.getInputProps("password")} />
                 {error && (
                   <Text size="sm" c="red">
                     {error}
@@ -72,7 +72,7 @@ export const Login = () => {
                 )}
                 <Group justify="flex-end">
                   <Button type="submit" loading={submitting} fullWidth>
-                    Sign in
+                    Create account
                   </Button>
                 </Group>
               </Stack>

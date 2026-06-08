@@ -18,6 +18,9 @@ export const migrate = async (db: Db): Promise<void> => {
   // working without a migration prompt.
   await db`ALTER TABLE users ADD COLUMN IF NOT EXISTS username TEXT`;
   await db`ALTER TABLE users ADD COLUMN IF NOT EXISTS name TEXT`;
+  // username is a login identifier (alongside email), so it must be unique.
+  // Partial index keeps legacy rows with a NULL username valid.
+  await db`CREATE UNIQUE INDEX IF NOT EXISTS users_username_unique ON users (username) WHERE username IS NOT NULL`;
   await db`
     CREATE TABLE IF NOT EXISTS user_app_provisions (
       user_id INTEGER NOT NULL,

@@ -11,6 +11,7 @@ import { Dashboard } from "./pages/dashboard.tsx";
 import { Domains } from "./pages/domains.tsx";
 import { Images } from "./pages/images.tsx";
 import { Login } from "./pages/login.tsx";
+import { Signup } from "./pages/signup.tsx";
 import { CreateLxc } from "./pages/lxc/create.tsx";
 import { LxcDetail } from "./pages/lxc/detail.tsx";
 import { LxcList } from "./pages/lxc/index.tsx";
@@ -23,7 +24,7 @@ import { Users } from "./pages/users/index.tsx";
 import { Shell } from "./shell.tsx";
 
 export const App = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, needsSetup } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -34,7 +35,7 @@ export const App = () => {
     );
   }
 
-  if (!user) return <Login />;
+  if (!user) return needsSetup ? <Signup /> : <Login />;
 
   // OIDC consent: rendered full-bleed (no Shell) since it's a one-shot
   // hand-off that immediately redirects to the relying party. Castle is

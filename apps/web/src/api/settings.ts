@@ -6,6 +6,8 @@ export type Settings = {
 
 export type AuthStatus = {
   authRequired: boolean;
+  needsSetup?: boolean;
+  ollama?: boolean;
   user?: { id: number; email: string };
 };
 

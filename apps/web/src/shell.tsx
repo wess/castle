@@ -41,7 +41,7 @@ const nav = [
 export const Shell = ({ children }: { children: ReactNode }) => {
   const [opened, { toggle }] = useDisclosure();
   const location = useLocation();
-  const { user, authRequired, signOut } = useAuth();
+  const { user, authRequired, ollamaEnabled, signOut } = useAuth();
 
   const initial = user?.email?.[0]?.toUpperCase() ?? "C";
 
@@ -103,7 +103,9 @@ export const Shell = ({ children }: { children: ReactNode }) => {
       </AppShell.Header>
 
       <AppShell.Navbar p="xs">
-        {nav.map((item) => {
+        {nav
+          .filter((item) => item.to !== "/ollama" || ollamaEnabled)
+          .map((item) => {
           const Icon = item.icon;
           const active = item.to === "/" ? location.pathname === "/" : location.pathname.startsWith(item.to);
           return (

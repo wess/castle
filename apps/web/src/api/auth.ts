@@ -9,7 +9,12 @@ export type Me = {
   user: { sub: number; email: string };
 };
 
-export const login = (email: string, password: string) => post<LoginResponse>("/auth/login", { email, password });
+export const login = (identifier: string, password: string) =>
+  post<LoginResponse>("/auth/login", { identifier, password });
+
+export type SignupInput = { username: string; password: string; email?: string; name?: string };
+
+export const signup = (input: SignupInput) => post<LoginResponse>("/auth/signup", input);
 
 export const me = () => get<Me>("/auth/me");
 
