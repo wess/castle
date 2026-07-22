@@ -122,3 +122,5 @@ now — if you're brave enough to run it, file issues.
 ## License
 
 Apache 2.0 — see [LICENSE](LICENSE).
+
+♥ [Sponsor this project](https://github.com/sponsors/wess)
