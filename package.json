@@ -1,6 +1,6 @@
 {
   "name": "castle",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "private": true,
   "license": "MIT",
   "type": "module",
@@ -9,7 +9,7 @@
     "apps/*"
   ],
   "dependencies": {
-    "atlas": "github:wess/atlas#main"
+    "atlas": "github:wess/atlas#v0.3.0"
   },
   "scripts": {
     "dev": "bun run scripts/dev.ts",

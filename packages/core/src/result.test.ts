@@ -21,7 +21,7 @@ describe("result", () => {
 
   test("map passes an err through untouched", () => {
     const r: Result<number, string> = err("nope");
-    expect(map(r, (n) => n * 3)).toEqual({ ok: false, error: "nope" });
+    expect(map(r, (n: number) => n * 3)).toEqual({ ok: false, error: "nope" });
   });
 
   test("unwrap returns the value for ok", () => {
