@@ -86,7 +86,12 @@ export const authRoutes = (secret: string) => [
       }
       const email = (body.email ?? "").trim().toLowerCase() || `${username}@${placeholderHost()}`;
       try {
-        const { user } = await usersStore.create(app().db, { email, username, password: body.password, name: body.name });
+        const { user } = await usersStore.create(app().db, {
+          email,
+          username,
+          password: body.password,
+          name: body.name,
+        });
         const token = await sign({ sub: user.id, email: user.email }, secret);
         return json(c, 201, { token, user: { id: user.id, email: user.email, username: user.username } });
       } catch (err) {

@@ -1,4 +1,16 @@
-import { Box, Button, Card, Center, Group, PasswordInput, Stack, Text, TextInput, ThemeIcon, Title } from "@mantine/core";
+import {
+  Box,
+  Button,
+  Card,
+  Center,
+  Group,
+  PasswordInput,
+  Stack,
+  Text,
+  TextInput,
+  ThemeIcon,
+  Title,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { Castle } from "lucide-react";
 import { useState } from "react";

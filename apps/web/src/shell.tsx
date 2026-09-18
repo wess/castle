@@ -106,20 +106,20 @@ export const Shell = ({ children }: { children: ReactNode }) => {
         {nav
           .filter((item) => item.to !== "/ollama" || ollamaEnabled)
           .map((item) => {
-          const Icon = item.icon;
-          const active = item.to === "/" ? location.pathname === "/" : location.pathname.startsWith(item.to);
-          return (
-            <NavLink
-              key={item.to}
-              component={RouterLink}
-              to={item.to}
-              label={item.label}
-              leftSection={<Icon size={16} />}
-              active={active}
-              variant="light"
-            />
-          );
-        })}
+            const Icon = item.icon;
+            const active = item.to === "/" ? location.pathname === "/" : location.pathname.startsWith(item.to);
+            return (
+              <NavLink
+                key={item.to}
+                component={RouterLink}
+                to={item.to}
+                label={item.label}
+                leftSection={<Icon size={16} />}
+                active={active}
+                variant="light"
+              />
+            );
+          })}
       </AppShell.Navbar>
 
       <AppShell.Main>{children}</AppShell.Main>

@@ -59,11 +59,7 @@ export const Login = () => {
               })}
             >
               <Stack gap="md">
-                <TextInput
-                  label="Username or email"
-                  autoComplete="username"
-                  {...form.getInputProps("identifier")}
-                />
+                <TextInput label="Username or email" autoComplete="username" {...form.getInputProps("identifier")} />
                 <PasswordInput label="Password" autoComplete="current-password" {...form.getInputProps("password")} />
                 {error && (
                   <Text size="sm" c="red">
