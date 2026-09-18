@@ -10,7 +10,7 @@
     "build": "bun build src/index.ts --target=bun --outfile=dist/castle"
   },
   "dependencies": {
-    "atlas": "github:wess/atlas#main",
+    "atlas": "github:wess/atlas#v0.3.0",
     "@castle/core": "workspace:*"
   }
 }
